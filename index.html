@@ -3,98 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하천 오염 AI 연구 가이드</title>
+    <title>River AI Research Guide Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState } = React;
 
         function App() {
-            const [activeTab, setActiveTab] = useState('v2');
+            const [view, setView] = useState('v2'); // 기본값을 상세 가이드로 설정
 
-            // 원본 파일 1 데이터
-            const datasetsV1 = [
-                { name: "TUD-GV", link: "https://zenodo.org/record/5716552" },
-                { name: "YRDG", link: "https://github.com/YellowRiverDataset" },
-                { name: "WATER-DET", link: "https://github.com/water-det" },
-                { name: "TUD-HCMC", link: "https://zenodo.org/records/17387612" }
+            // 데이터셋 정보 (File 1 기반)
+            const datasets = [
+                { name: "TUD-GV", link: "https://zenodo.org/record/5716552", desc: "오염 정도 4단계 분류 연습용" },
+                { name: "YRDG", link: "https://github.com/YellowRiverDataset", desc: "부유 쓰레기 탐지 실험용" },
+                { name: "WATER-DET", link: "https://github.com/water-det", desc: "다양한 오염 징후 확장 연구용" },
+                { name: "TUD-HCMC", link: "https://zenodo.org/records/17387612", desc: "수질 데이터셋" }
             ];
 
-            // 원본 파일 2 데이터
+            // 연구 8단계 로드맵 (File 2 기반)
             const steps = [
-                { no: 1, title: "연구 질문 좁히기", emoji: "🎯", summary: "사진으로 직접 보이는 오염 징후 중심" },
-                { no: 2, title: "데이터셋 찾기", emoji: "🗂️", summary: "공개 데이터 + 직접 촬영 조합" },
-                { no: 3, title: "현장 촬영 계획", emoji: "📷", summary: "동일 조건 반복 촬영 중요" },
-                { no: 4, title: "라벨링 기준", emoji: "🏷️", summary: "객관적 기준표 우선 작성" },
-                { no: 5, title: "전처리", emoji: "🧼", summary: "배경 제거 및 빛 반사 보정" },
-                { no: 6, title: "모델 구축", emoji: "🤖", summary: "분류에서 탐지로 단계적 확장" },
-                { no: 7, title: "평가", emoji: "📊", summary: "데이터 오염(Leakage) 방지" },
-                { no: 8, title: "결과 해석", emoji: "🔍", summary: "실패 사례 원인 분석" }
+                { no: 1, title: "연구 질문 좁히기", emoji: "🎯", desc: "가시적 오염 징후(쓰레기, 거품 등) 중심" },
+                { no: 2, title: "데이터셋 확보", emoji: "🗂️", desc: "공개 데이터 + 직접 촬영 데이터 조합" },
+                { no: 3, title: "현장 촬영 계획", emoji: "📷", summary: "동일 조건 반복 촬영(위치, 각도 등)" },
+                { no: 4, title: "라벨링 기준", emoji: "🏷️", summary: "오염도 등급(0-3단계) 기준표 작성" },
+                { no: 5, title: "데이터 전처리", emoji: "🧼", summary: "배경 제거 및 빛 반사 보정" },
+                { no: 6, title: "모델 아키텍처", emoji: "🤖", summary: "분류 모델에서 탐지 모델로 확장" },
+                { no: 7, title: "공정한 평가", emoji: "📊", summary: "학습/평가 데이터셋의 엄격한 분리" },
+                { no: 8, title: "결과 해석", emoji: "🔍", summary: "실패 사례(반사광 등) 원인 분석" }
             ];
 
             return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-                    <nav className="sticky top-0 z-50 bg-white shadow-sm p-4 flex justify-center gap-4">
-                        <button onClick={() => setActiveTab('v1')} className={`px-4 py-2 rounded-full font-bold ${activeTab === 'v1' ? 'bg-teal-600 text-white' : 'bg-slate-100'}`}>버전 1: 퀵 가이드</button>
-                        <button onClick={() => setActiveTab('v2')} className={`px-4 py-2 rounded-full font-bold ${activeTab === 'v2' ? 'bg-cyan-700 text-white' : 'bg-slate-100'}`}>버전 2: 심층 로드맵</button>
+                <div className="min-h-screen flex flex-col">
+                    {/* 상단 내비게이션 */}
+                    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4">
+                        <div className="max-w-6xl mx-auto flex justify-between items-center">
+                            <h1 className="text-xl font-bold text-teal-800">River Pollution AI</h1>
+                            <div className="flex bg-slate-100 p-1 rounded-xl">
+                                <button 
+                                    onClick={() => setView('v1')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${view === 'v1' ? 'bg-white shadow-sm text-teal-600' : 'text-slate-500'}`}
+                                >
+                                    퀵 가이드 (V1)
+                                </button>
+                                <button 
+                                    onClick={() => setView('v2')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${view === 'v2' ? 'bg-white shadow-sm text-teal-600' : 'text-slate-500'}`}
+                                >
+                                    심층 로드맵 (V2)
+                                </button>
+                            </div>
+                        </div>
                     </nav>
 
-                    {activeTab === 'v1' ? (
-                        <div className="p-8 max-w-4xl mx-auto">
-                            <h1 className="text-3xl font-bold mb-6 text-teal-700 text-center">하천 오염 판별 AI 연구 가이드 (Simple)</h1>
-                            <div className="grid gap-4 md:grid-cols-2 mb-10">
-                                {datasetsV1.map(d => (
-                                    <a key={d.name} href={d.link} target="_blank" className="p-4 bg-white border rounded-xl hover:shadow-md transition">
-                                        <div className="font-bold">{d.name}</div>
-                                        <div className="text-sm text-slate-500">데이터셋 바로가기</div>
-                                    </a>
-                                ))}
-                            </div>
-                            <div className="bg-white p-6 rounded-xl border shadow-sm">
-                                <h2 className="text-xl font-bold mb-4">🧠 모델 구조</h2>
-                                <svg viewBox="0 0 600 200" className="w-full h-auto">
-                                    <rect x="20" y="60" width="120" height="60" fill="#0ea5e9" rx="8" />
-                                    <text x="35" y="95" fill="white" fontSize="14">이미지 입력</text>
-                                    <rect x="180" y="60" width="120" height="60" fill="#22c55e" rx="8" />
-                                    <text x="205" y="95" fill="white" fontSize="14">특징 추출</text>
-                                    <rect x="340" y="60" width="120" height="60" fill="#f59e0b" rx="8" />
-                                    <text x="365" y="95" fill="white" fontSize="14">오염 탐지</text>
-                                    <rect x="500" y="60" width="80" height="60" fill="#ef4444" rx="8" />
-                                    <text x="525" y="95" fill="white" fontSize="14">결과</text>
-                                    <path d="M140 90 H180 M300 90 H340 M460 90 H500" stroke="#cbd5e1" strokeWidth="2" fill="none" />
-                                </svg>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="p-8 max-w-6xl mx-auto">
-                            <div className="text-center mb-12">
-                                <h1 className="text-4xl font-bold text-slate-800 mb-4">하천 오염 판별 AI 연구 가이드 (Advanced)</h1>
-                                <p className="text-slate-600">성공적인 AI 연구를 위한 8단계 로드맵</p>
-                            </div>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {steps.map(s => (
-                                    <div key={s.no} className="bg-white p-6 rounded-2xl border hover:border-cyan-500 transition shadow-sm">
-                                        <div className="text-3xl mb-2">{s.emoji}</div>
-                                        <div className="text-xs font-bold text-cyan-600 uppercase">Step {s.no}</div>
-                                        <h3 className="font-bold text-lg my-2">{s.title}</h3>
-                                        <p className="text-sm text-slate-500">{s.summary}</p>
+                    {/* 컨텐츠 영역 */}
+                    <main className="flex-grow max-w-6xl mx-auto w-full p-6 sm:p-10 fade-in">
+                        {view === 'v1' ? (
+                            <div className="space-y-12">
+                                <section className="text-center py-10">
+                                    <h2 className="text-3xl font-bold text-slate-800">입문자를 위한 퀵 가이드</h2>
+                                    <p className="mt-4 text-slate-600">핵심 도구와 데이터셋을 빠르게 확인하세요.</p>
+                                </section>
+                                
+                                <section className="grid md:grid-cols-2 gap-6">
+                                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">📂 데이터셋 바로가기</h3>
+                                        <div className="space-y-4">
+                                            {datasets.map(d => (
+                                                <a key={d.name} href={d.link} target="_blank" className="block p-4 rounded-xl border border-slate-50 hover:bg-teal-50 hover:border-teal-100 transition">
+                                                    <div className="font-bold text-teal-700">{d.name}</div>
+                                                    <div className="text-sm text-slate-500">{d.desc}</div>
+                                                </a>
+                                            ))}
+                                        </div>
                                     </div>
-                                ))}
+                                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                                        <h3 className="text-xl font-bold mb-6 italic">🧠 CNN 모델 구조</h3>
+                                        <div className="aspect-video bg-slate-50 rounded-xl p-4 flex items-center justify-center">
+                                            <svg viewBox="0 0 600 200" className="w-full">
+                                                <rect x="20" y="70" width="100" height="60" rx="10" fill="#0ea5e9" />
+                                                <text x="32" y="105" fill="white" fontSize="12" fontWeight="bold">이미지 입력</text>
+                                                <rect x="170" y="70" width="100" height="60" rx="10" fill="#22c55e" />
+                                                <text x="187" y="105" fill="white" fontSize="12" fontWeight="bold">특징 추출</text>
+                                                <rect x="320" y="70" width="100" height="60" rx="10" fill="#f59e0b" />
+                                                <text x="337" y="105" fill="white" fontSize="12" fontWeight="bold">오염 탐지</text>
+                                                <rect x="470" y="70" width="80" height="60" rx="10" fill="#ef4444" />
+                                                <text x="492" y="105" fill="white" fontSize="12" fontWeight="bold">결과</text>
+                                                <path d="M120 100 H170 M270 100 H320 M420 100 H470" stroke="#94a3b8" strokeWidth="2" markerEnd="url(#arrow)" />
+                                            </svg>
+                                        </div>
+                                        <p className="mt-4 text-sm text-slate-500 text-center italic">이미지 기반 수질 오염 판별의 기본적인 인공지능 흐름도입니다.</p>
+                                    </div>
+                                </section>
                             </div>
-                            <div className="mt-12 bg-slate-900 text-white p-8 rounded-3xl">
-                                <h2 className="text-2xl font-bold mb-4 text-center">마지막으로, 가장 중요한 한 문장</h2>
-                                <p className="text-lg text-slate-300 leading-relaxed text-center italic">
-                                    "좋은 인공지능 모델은 복잡한 알고리즘이 아니라, 잘 정의된 연구 질문과 성실한 관찰 데이터에서 출발합니다."
-                                </p>
+                        ) : (
+                            <div className="space-y-12">
+                                <section className="bg-slate-900 text-white p-10 rounded-3xl mb-12 shadow-xl">
+                                    <h2 className="text-3xl font-bold mb-4">심층 연구 로드맵</h2>
+                                    <p className="text-slate-400 text-lg leading-relaxed">
+                                        "좋은 모델은 성실한 관찰 데이터에서 출발합니다."<br/>
+                                        8단계 연구 프로세스를 통해 논리적이고 체계적인 연구를 설계하세요.
+                                    </p>
+                                </section>
+
+                                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {steps.map(s => (
+                                        <div key={s.no} className="bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-lg transition-all group">
+                                            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{s.emoji}</div>
+                                            <div className="text-xs font-bold text-teal-600 mb-1">STEP {s.no}</div>
+                                            <h4 className="text-lg font-bold text-slate-800 mb-2">{s.title}</h4>
+                                            <p className="text-sm text-slate-500 leading-snug">{s.desc || s.summary}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <section className="bg-teal-50 border border-teal-100 p-8 rounded-3xl">
+                                    <h3 className="text-xl font-bold text-teal-900 mb-4">💡 연구 핵심 팁</h3>
+                                    <ul className="grid md:grid-cols-2 gap-4">
+                                        {[
+                                            "수질 전체보다 '가시적 징후'에 집중하세요.",
+                                            "빛 반사는 통제해야 할 중요한 연구 변수입니다.",
+                                            "라벨링 기준표를 사전에 정의하여 객관성을 높이세요.",
+                                            "실패한 사례의 원인 분석이 연구의 완성도를 결정합니다."
+                                        ].map((tip, idx) => (
+                                            <li key={idx} className="flex gap-3 text-teal-800 text-sm">
+                                                <span className="text-teal-500 font-bold">●</span> {tip}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </section>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </main>
+
+                    <footer className="py-10 text-center text-slate-400 text-sm border-t border-slate-200">
+                        <p>© 2026 River AI Research Guide. Built with React & Tailwind.</p>
+                    </footer>
                 </div>
             );
         }
